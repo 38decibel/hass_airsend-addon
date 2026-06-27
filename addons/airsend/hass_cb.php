@@ -44,10 +44,21 @@ if (is_array($data) && isset($data['events'])) {
 					}else{
 						$api->setState($entity_id, 'error', 'error_'.$val['type'], $val['timestamp'], $val['channel']);
 					}
+				//Fallback: uid unknown (e.g. physical remote already synced to box)
+				//Try to match by channel to propagate state to known HA entities
+				}else if($val['type'] == 3){
+					$states = $api->convertNotesToStates($val['thingnotes']['notes']);
+					foreach ($states as $j => $state) {
+						$entities = $api->searchEntitiesFromChannelAndType($val['channel'], $state[0]);
+						foreach ($entities as $k => $eid) {
+							trigger_error("state_propagation (channel match) : ".$eid." ".$state[0]." ".$state[1], E_USER_NOTICE);
+							$api->setState($eid, $state[0], $state[1], $val['timestamp'], $val['channel']);
+						}
+					}
 				}
 			//Interrupt event
 			}else{
-				if($val['type'] == 3){			//Event type GOT (sensor)
+				if($val['type'] == 3){		//Event type GOT (sensor)
 					$isreliable = false;
 					if($val['reliability'] > 0x6 && $val['reliability'] < 0x47){
 						$isreliable = true;
