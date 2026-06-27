@@ -28,6 +28,8 @@ if(!$api->isAuthorized()){
 }
 
 $raw = file_get_contents('php://input');
+trigger_error("raw input: ".$raw, E_USER_NOTICE); // DEBUG
+$data = json_decode($raw, true, 512, JSON_BIGINT_AS_STRING);
 $data = json_decode($raw, true, 512, JSON_BIGINT_AS_STRING);
 if (is_array($data) && isset($data['events'])) {
 	foreach ($data['events'] as $i => $val) {
