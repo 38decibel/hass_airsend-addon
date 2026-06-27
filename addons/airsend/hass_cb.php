@@ -28,8 +28,6 @@ if(!$api->isAuthorized()){
 }
 
 $raw = file_get_contents('php://input');
-trigger_error("raw input: ".$raw, E_USER_NOTICE); // DEBUG
-$data = json_decode($raw, true, 512, JSON_BIGINT_AS_STRING);
 $data = json_decode($raw, true, 512, JSON_BIGINT_AS_STRING);
 if (is_array($data) && isset($data['events'])) {
 	foreach ($data['events'] as $i => $val) {
@@ -46,9 +44,9 @@ if (is_array($data) && isset($data['events'])) {
 					}else{
 						$api->setState($entity_id, 'error', 'error_'.$val['type'], $val['timestamp'], $val['channel']);
 					}
-				//Fallback: uid unknown (e.g. physical remote already synced to box)
+				//Fallback: uid unknown (e.g. physical remote or app already synced to box)
 				//Try to match by channel to propagate state to known HA entities
-				}else if($val['type'] == 3){
+				}else{
 					$states = $api->convertNotesToStates($val['thingnotes']['notes']);
 					foreach ($states as $j => $state) {
 						$entities = $api->searchEntitiesFromChannelAndType($val['channel'], $state[0]);
