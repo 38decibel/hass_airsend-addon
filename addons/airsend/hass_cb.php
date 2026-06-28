@@ -1,4 +1,9 @@
 <?php
+$method = $_SERVER['REQUEST_METHOD'] ?? 'UNKNOWN';
+$uri = $_SERVER['REQUEST_URI'] ?? '/';
+$raw = file_get_contents('php://input');
+error_log("REQUEST: $method $uri | BODY: $raw");
+
 require_once dirname(__FILE__) . "/hassapi.class.php";
 
 $SUPERVISOR_TOKEN = @getenv("SUPERVISOR_TOKEN");
